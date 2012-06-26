@@ -2,14 +2,10 @@
 <?php require_once dirname(__FILE__) . '/feathr.php'; ?>
 <?php
 
-
 $app = new Feathr\Feathr('Feathr');
 
-#$app->fetch(':any.css', function ($file) use ($app) {
-#	$app->css($file);
-#});
-
 $app->fetch('/', function () use ($app) {
+	var_dump($validate);
 	$app->view('home');
 });
 

@@ -1,8 +1,6 @@
 <?php
 
-namespace Feathr\Validate;
-#use Feathr;
-
+use Feathr;
 class Validate extends Feathr {
 	
 	public function filter ($check, $key) {
