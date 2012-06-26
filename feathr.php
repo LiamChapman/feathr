@@ -11,9 +11,10 @@ class Feathr {
 	public $header	  = '/views/includes/header.php';
 	public $footer	  = '/views/includes/footer.php';
 	
-	public function __construct ($app_name) {
-		$this->root		= $_SERVER['DOCUMENT_ROOT'];
-		$this->app_name = $app_name;		
+	public function __construct ($app_name, $view_path = null) {
+		$this->root		 = $_SERVER['DOCUMENT_ROOT'];
+		$this->app_name  = $app_name;
+		$this->view_path = !is_null($view_path) ? $view_path : $this->view_path;
 	}
 	
 	public function fetch ($route, $callback) {
