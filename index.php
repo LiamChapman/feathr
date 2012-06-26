@@ -4,8 +4,7 @@
 
 $app = new Feathr\Feathr('Feathr');
 
-$app->fetch('/', function () use ($app) {
-	var_dump($validate);
+$app->get('/', function () use ($app) {
 	$app->view('home');
 });
 

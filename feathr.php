@@ -6,27 +6,48 @@ class Feathr {
 
 	public $app_name, $actions = array(), $data = array();		
 	
-	public $root;
+	public $root, $method;
 	public $view_path = '/views/';		
 	public $header	  = '/views/includes/header.php';
 	public $footer	  = '/views/includes/footer.php';
 	
 	public function __construct ($app_name, $view_path = null) {
 		$this->root		 = $_SERVER['DOCUMENT_ROOT'];
+		$this->method	 = strtolower($_SERVER['REQUEST_METHOD']);
 		$this->app_name  = $app_name;
 		$this->view_path = !is_null($view_path) ? $view_path : $this->view_path;
 	}
 	
-	public function fetch ($route, $callback) {
-		if(strpos($route, ",")) {
-			$routes = explode(",", $route);
-			foreach($routes as $r) {
-				$this->actions[$r] = $callback;
+	public function get ($route, $callback) {
+		if($this->method === 'get') {
+			if(strpos($route, ",")) {
+				$routes = explode(",", $route);
+				foreach($routes as $r) {
+					$this->actions[$r] = $callback;
+				}
+			} else {
+				$this->actions[$route] = $callback;
 			}
+			return $this;
 		} else {
-			$this->actions[$route] = $callback;
+			$this->E404();
 		}
-		return $this;
+	}
+	
+	public function post ($route, $callback) {
+		if($this->method === 'post') {
+			if(strpos($route, ",")) {
+				$routes = explode(",", $route);
+				foreach($routes as $r) {
+					$this->actions[$r] = $callback;
+				}
+			} else {
+				$this->actions[$route] = $callback;
+			}
+			return $this;
+		} else {
+			$this->E404();
+		}
 	}
 	
 	public function feedback ($msg, $type='success', $flash = true) {
@@ -79,15 +100,15 @@ class Feathr {
 			}
 		});
 		# css
-		$this->fetch(':any.css', function ($file) use ($instance) {
+		$this->get(':any.css', function ($file) use ($instance) {
 			$instance->css($file);
 		});
 		# js
-		$this->fetch(':any.js', function ($file) use ($instance) {
+		$this->get(':any.js', function ($file) use ($instance) {
 			$instance->js($file);
 		});
 		# images
-		$this->fetch(':any.png, :any.jpg, :any.gif', function ($file) use ($instance) {
+		$this->get(':any.png, :any.jpg, :any.gif', function ($file) use ($instance) {
 			$instance->image($file);
 		});
 	}
