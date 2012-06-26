@@ -1,0 +1,12 @@
+@import url('reset.css');
+
+body {
+	background: url(../images/bkg_tile.png) repeat #e7e7e7;
+}
+
+#wrapper h1 {
+	padding: 20px;
+	margin: 0 auto;
+	width: 250px;
+	height: 305px;
+}

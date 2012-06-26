@@ -17,8 +17,78 @@ class Feathr {
 	}
 	
 	public function fetch ($route, $callback) {
-		$this->actions[$route] = $callback;
+		if(strpos($route, ",")) {
+			$routes = explode(",", $route);
+			foreach($routes as $r) {
+				$this->actions[$r] = $callback;
+			}
+		} else {
+			$this->actions[$route] = $callback;
+		}
 		return $this;
+	}
+	
+	public function feedback ($msg, $type='success', $flash = true) {
+		//not complete yet.
+	}
+	
+	public function view ($file, $vars, $hf = true) {
+		$vars = $this->vars($vars);
+		$file = is_null($file) ? 'default' : $file;
+		if (file_exists($this->root.$this->view_path.$file.'.php')) {
+			if (is_array($vars) && count($vars) > 0) {
+				extract($vars, EXTR_PREFIX_SAME, "wddx");			
+			}
+			if ($hf) {
+				include_once($this->root.$this->header);	
+			}
+			include_once($this->root.$this->view_path.$file.'.php');
+			if ($hf) {
+				include_once($this->root.$this->footer);	
+			}
+		}
+		return $this;
+	}
+	
+	public function vars ($vars = array ()) {
+		$defaults = array(
+			'app_name' => $this->app_name
+		);
+		if(!empty($vars)) {
+			foreach($vars as $key => $value) {
+				if(array_key_exists($key,$defaults)) {
+					unset($defaults[$key]);
+				}
+			}
+			$defaults = array_merge($vars, $defaults);
+		}
+		return $defaults;
+	}
+	
+	public function autoload () {
+		$instance = new self(); 
+		# namespaces //needs testing - probably won't work.
+		spl_autoload_register( function ($class) {
+			if ( file_exists($this->root.'/vendor/feathr/'.$class.'.php') ) {
+				$class = $this->root.'/vendor/feathr/' . str_replace('\\', '/', $class) . '.php';
+				require_once($class);
+			} else if ( file_exists($this->root.'/vendor/extend/'.$class.'.php') ) {
+				$class = $this->root.'/vendor/extend/' . str_replace('\\', '/', $class) . '.php';
+				require_once($class);
+			}
+		});
+		# css
+		$this->fetch(':any.css', function ($file) use ($instance) {
+			$instance->css($file);
+		});
+		# js
+		$this->fetch(':any.js', function ($file) use ($instance) {
+			$instance->js($file);
+		});
+		# images
+		$this->fetch(':any.png, :any.jpg, :any.gif', function ($file) use ($instance) {
+			$instance->image($file);
+		});
 	}
 
 	public function route () {
@@ -40,72 +110,41 @@ class Feathr {
 		if($counter === 0) {
 			$this->E404();
 		}
-	}	
+	}					
 	
-	public function filter ($check, $key) {
-		$counter = 0;
-		$filters = array(
-			'int' 		=> FILTER_SANITIZE_NUMBER_INT,
-			'string'	=> FILTER_SANITIZE_STRING,
-			'float'		=> FILTER_SANITIZE_NUMBER_FLOAT,
-			'url'		=> FILTER_SANITIZE_URL,
-			'html'		=> FILTER_SANITIZE_MAGIC_QUOTES,
-			'email'		=> FILTER_VALIDATE_EMAIL
-		);
-		if(is_array($check)) {
-			foreach ($check as $i => $c) {
-				if(is_array($key)) {
-					foreach ($key as $x => $k) {
-						if(!filter_var($check[$x], $filters[$k])) {
-							$this->feedback('Error validating', 'error');
-							++$counter;	
-						}
-					}
-				} else {
-					if(!filter_var($c, $filters[$key])) {
-						$this->feedback('Error validating', 'error');
-						++$counter;
-					}
-				}
-			}
-		} else {
-			if(!filter_var($check, $filters[$key])) {
-				$this->feedback('Error validating', 'error');
-				++$counter;
-			}
-		}
-		if($counter > 1) {
-			$this->E404(); //tempory until feedback and views working.
-		}
+	public function css ($file) {
+		header('Content-Type: text/css');
+		echo(file_get_contents($this->root.$file.'.css'));
+		exit;
 	}
 	
-	public function feedback ($msg, $type='success', $flash = true) {
-		
+	public function js ($file) {
+		header('Content-Type: application/javascript');
+		echo(file_get_contents($this->root.$file.'.js'));
+		exit;
 	}
 	
-	public function view ($file, $vars, $hf = true) {
-		$file = is_null($file) ? 'default' : $file;
-		if (file_exists($this->root.$this->view_path.$file.'.php')) {
-			if (is_array($vars) && count($vars) > 0) {
-				extract($vars, EXTR_PREFIX_SAME, "wddx");			
-			}
-			if ($hf) {
-				include_once($this->root.$this->header);	
-			}
-			include_once($this->root.$this->view_path.$file.'.php');
-			if ($hf) {
-				include_once($this->root.$this->footer);	
-			}
+	public function image ($file) {		
+		if (file_exists($this->root.$file.'.png')) {
+			header('Content-Type: image/png');
+			readfile($this->root.$file.'.png');
+		} else if (file_exists($this->root.$file.'.jpg')) {
+			header('Content-Type: image/jpeg');
+			readfile($this->root.$file.'.jpg');
+		} else if (file_exists($this->root.$file.'.gif')){
+			header('Content-Type: image/gif');
+			readfile($this->root.$file.'.gif');
 		}
-		return $this;
-	}
+		exit;
+	}			
 	
-	public function run ($error_reporting = 0, $charset = 'utf-8') {
+	public function run ($error_reporting = 0, $charset = 'utf-8') {		
 		error_reporting($error_reporting);
 		ini_set('default_charset', $charset);
 		mb_internal_encoding($charset);
 		mb_detect_order($charset);
-		session_start();
+		session_start();				
+		$this->autoload();
 		$this->route();
 		exit;
 	}	

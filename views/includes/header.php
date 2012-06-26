@@ -2,12 +2,12 @@
 <html>
 	<head>
 		<title><?=$app_name?></title>
+		<link rel="stylesheet" href="/views/media/styles/feathr.css" />
 	</head>
 	<body>
 		<div id="header_wrapper">
 			<div id="header">
-				<h1><?=$app_name?> Project</h1>
-				<h2>The PHP Micro-Framework, light as a Feathr</h2>
+				<!-- silence is golden -->
 			</div><!-- end header -->
 		</div><!-- end header_wrapper -->
 		<div id="wrapper">	

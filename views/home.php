@@ -1,1 +1,1 @@
-<p>Hello, World!</p>
+<h1><img src="/views/media/images/logo.png" alt="Feathr" /></h1>
