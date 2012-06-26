@@ -6,11 +6,13 @@ class Feathr {
 
 	public $app_name, $actions = array(), $data = array();		
 	
-	public $view_path = '/views';		
-	public $header	  = '/views/header.php';
-	public $footer	  = '/views/footer.php';
+	public $root;
+	public $view_path = '/views/';		
+	public $header	  = '/views/includes/header.php';
+	public $footer	  = '/views/includes/footer.php';
 	
 	public function __construct ($app_name) {
+		$this->root		= $_SERVER['DOCUMENT_ROOT'];
 		$this->app_name = $app_name;		
 	}
 	
@@ -55,20 +57,20 @@ class Feathr {
 				if(is_array($key)) {
 					foreach ($key as $x => $k) {
 						if(!filter_var($check[$x], $filters[$k])) {
-							$this->feedback('Error validating');
+							$this->feedback('Error validating', 'error');
 							++$counter;	
 						}
 					}
 				} else {
 					if(!filter_var($c, $filters[$key])) {
-						$this->feedback('Error validating');
+						$this->feedback('Error validating', 'error');
 						++$counter;
 					}
 				}
 			}
 		} else {
 			if(!filter_var($check, $filters[$key])) {
-				$this->feedback('Error validating');
+				$this->feedback('Error validating', 'error');
 				++$counter;
 			}
 		}
@@ -83,16 +85,16 @@ class Feathr {
 	
 	public function view ($file, $vars, $hf = true) {
 		$file = is_null($file) ? 'default' : $file;
-		if (file_exists($this->view_path.$file.'.php')) {
+		if (file_exists($this->root.$this->view_path.$file.'.php')) {
 			if (is_array($vars) && count($vars) > 0) {
 				extract($vars, EXTR_PREFIX_SAME, "wddx");			
 			}
 			if ($hf) {
-				include_once($this->header);	
+				include_once($this->root.$this->header);	
 			}
-			include_once($this->view_path.$file.'.php');
+			include_once($this->root.$this->view_path.$file.'.php');
 			if ($hf) {
-				include_once($this->footer);	
+				include_once($this->root.$this->footer);	
 			}
 		}
 		return $this;

@@ -7,7 +7,7 @@
 $app = new Feathr\Feathr('Test Application');
 
 $app->fetch('/', function () use ($app) {
-	echo 'Hello, World';
+	$app->view('home');
 });
 
 $app->fetch('/test', function () use ($app) {
