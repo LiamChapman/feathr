@@ -1,10 +1,10 @@
 
 <?php version_compare(PHP_VERSION, '5.3', '<') ? exit("PHP 5.3 or Higher") : ''; ?>
-<?php require_once dirname(__FILE__) . '/application.php'; ?>
+<?php require_once dirname(__FILE__) . '/feathr.php'; ?>
 <?php
 
 
-$app = new Application\Feathr('Test Application');
+$app = new Feathr\Feathr('Test Application');
 
 $app->fetch('/', function () use ($app) {
 	echo 'Hello, World';
