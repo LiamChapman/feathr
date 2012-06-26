@@ -8,4 +8,11 @@ $app->get('/', function () use ($app) {
 	$app->view('home');
 });
 
+$app->get('/:string, /:string/:int', function ($str, $int) use ($app) {
+	$app->view(null, array(
+		'slug' 		=> $str,
+		'value'		=> $int
+	));
+});
+
 $app->run();

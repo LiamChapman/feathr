@@ -1,1 +1,1 @@
-<h1><img src="/views/media/images/logo.png" alt="Feathr" /></h1>
+<h1 id="logo"><img src="/views/media/images/logo.png" alt="Feathr" /></h1>

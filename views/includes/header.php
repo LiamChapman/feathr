@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title><?=$app_name?></title>
+		<title><?=$page_title?></title>
 		<link rel="stylesheet" href="/views/media/styles/feathr.css" />
 	</head>
 	<body>

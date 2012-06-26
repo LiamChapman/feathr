@@ -54,7 +54,7 @@ class Feathr {
 		//not complete yet.
 	}
 	
-	public function view ($file, $vars, $hf = true) {
+	public function view ($file = null, $vars, $hf = true) {
 		$vars = $this->vars($vars);
 		$file = is_null($file) ? 'default' : $file;
 		if (file_exists($this->root.$this->view_path.$file.'.php')) {
@@ -74,7 +74,7 @@ class Feathr {
 	
 	public function vars ($vars = array ()) {
 		$defaults = array(
-			'app_name' => $this->app_name
+			'page_title' => $this->app_name
 		);
 		if(!empty($vars)) {
 			foreach($vars as $key => $value) {
@@ -173,7 +173,12 @@ class Feathr {
 	
 	public function E404 () {
 		header( $_ENV['SERVER_PROTOCOL']." 404 Not Found", true, 404 );
-		exit('404 Error');
+		if ( file_exists($this->root.$this->view_path.'404.php') ) {
+			$this->view('404', array('page_title' => '404 Error'));
+			exit;
+		} else {			
+			exit('404 Error');
+		}
 	}
 	
 	public function __set ($name, $value) {
