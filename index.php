@@ -20,6 +20,9 @@ $app->group('blog', array(
 );
 # blog end
 
+# test
+$app->application('test', 'app');
+
 $app->get('/:string, /:string/:int', function ($str, $int) use ($app) {
 	$app->view(null, array(
 		'slug' 		=> $str,
