@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<title><?=$page_title?></title>
-		<link rel="stylesheet" href="/views/media/styles/feathr.css" />
+		<link rel="stylesheet" href="/media/styles/feathr.css" />
 	</head>
 	<body>
 		<div id="header_wrapper">

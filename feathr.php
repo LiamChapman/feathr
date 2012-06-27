@@ -1,4 +1,5 @@
 <?php 
+
 namespace Feathr;
 
 class Feathr {	
@@ -10,12 +11,13 @@ class Feathr {
 	public $header	  = 'includes/header.php';
 	public $footer	  = 'includes/footer.php';	
 	
-	public function __construct ($app_name, $view_path = null, $app_path = null) {
+	public function __construct ($app_name = null, $view_path = null, $app_path = null) {
 		$this->root		 = $_SERVER['DOCUMENT_ROOT'];
 		$this->method	 = strtolower($_SERVER['REQUEST_METHOD']);
 		$this->app_name  = $app_name;
 		$this->view_path = !is_null($view_path) ? $view_path : $this->view_path;
 		$this->app_path  = !is_null($app_path) ? $app_path : $this->app_path;
+		$this->autoload();
 	}	
 	
 	public function request ($route = null, $callback = null) {
@@ -42,6 +44,7 @@ class Feathr {
 					$this->actions[$route] = $app_callback;
 				}
 			}
+			return $this;
 		}
 	}	
 	
@@ -86,19 +89,15 @@ class Feathr {
 		return $defaults;
 	}	
 	
-	public function autoload () {
-		$instance = new self(); 		
-		spl_autoload_register( function ($class) { # namespaces needs testing - probably won't work.
-			if ( file_exists($this->root.'/vendor/feathr/'.$class.'.php') ) {
-				#$class = $this->root.'/vendor/feathr/' . str_replace('\\', '/', $class) . '.php';
-				$class = $this->root.'/vendor/feathr/'.$class.'.php';
-				require_once($class);
-			} else if ( file_exists($this->root.'/vendor/extend/'.$class.'.php') ) {
-				#$class = $this->root.'/vendor/extend/' . str_replace('\\', '/', $class) . '.php';
-				$class = $this->root.'/vendor/extend/'.$class.'.php';
-				require_once($class);
+	public function autoload () { /*
+		spl_autoload_register( function ($class) {	
+			$class = strtolower($class);		
+			if ( file_exists($this->root.'/extend/'.$class.'.php') ) {
+				echo $class; exit;
+				require_once($this->root.'/extend/'.$class.'.php');
 			}
-		});
+		}); */
+		require_once($this->root.'/extend/less.php');
 	}
 	
 	public function route () {
@@ -130,7 +129,6 @@ class Feathr {
 		mb_internal_encoding($charset);
 		mb_detect_order($charset);
 		session_start();				
-		$this->autoload();
 		$this->route();
 		exit;
 	}
@@ -151,6 +149,8 @@ class Feathr {
 			$this->request($args[0], $args[1]);
 		} else if ($call === 'post' && $this->method === 'post') {
 			$this->request($args[0], $args[1]);
+		} else if(!method_exists($this, $call)) {
+			$this->E404(); //throw exception instead?
 		}
 	}
 	
@@ -166,7 +166,7 @@ class Feathr {
 		} else if (isset($this->data[$name])) {
 			return $this->data[$name];
 		} else {
-			$this->E404();
+			$this->E404(); //throw exception instead?
 		}
 	}
 		
