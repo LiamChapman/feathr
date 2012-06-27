@@ -18,45 +18,21 @@ class Feathr {
 		$this->app_path  = !is_null($app_path) ? $app_path : $this->app_path;
 	}	
 	
-	public function get ($route = null, $callback = null) {
-		if($this->method === 'get') {
-			if (is_string($route)) {
-				if (strpos($route, ",")) {
-					$routes = explode(",", $route);
-					foreach($routes as $r) {
-						$this->actions[trim($r)] = $callback;
-					}
-				} else {
-					$this->actions[$route] = $callback;
+	public function request ($route = null, $callback = null) {
+		if (is_string($route)) {
+			if (strpos($route, ",")) {
+				$routes = explode(",", $route);
+				foreach($routes as $r) {
+					$this->actions[trim($r)] = $callback;
 				}
-				return $this;
 			} else {
-				return $route;
+				$this->actions[$route] = $callback;
 			}
+			return $this;
 		} else {
-			$this->E404();
+			return $route;
 		}
-	}	
-	
-	public function post ($route = null, $callback = null) {
-		if ($this->method === 'post') {
-			if (is_string($route)) {
-				if (strpos($route, ",")) {
-					$routes = explode(",", $route);
-					foreach ($routes as $r) {
-						$this->actions[trim($r)] = $callback;
-					}
-				} else {
-					$this->actions[$route] = $callback;
-				}
-				return $this;
-			} else {
-				return $route;
-			}
-		} else {
-			$this->E404();
-		}
-	}	
+	}		
 	
 	public function group ($id, $array) {
 		if (isset($id)) {
@@ -168,7 +144,16 @@ class Feathr {
 			exit('404 Error');
 		}
 	}
-		
+	
+	public function __call ($call, $args) {
+		$call = strtolower($call);
+		if ($call === 'get' && $this->method === 'get') {
+			$this->request($args[0], $args[1]);
+		} else if ($call === 'post' && $this->method === 'post') {
+			$this->request($args[0], $args[1]);
+		}
+	}
+	
 	public function __set ($name, $value) {
 		$this->data[$name] = $value;
 	}	

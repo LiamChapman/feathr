@@ -1,5 +1,7 @@
 <?php
 
 $app->get('/testing', function () use ($app) {
-	$app->view();
+	$app->view('home', array(
+		'str' => 'This is the testing application'
+	));
 });

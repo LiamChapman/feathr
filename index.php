@@ -8,6 +8,8 @@ $app->get('/', function () use ($app) {
 	$app->view('home');
 });
 
+$app->application('test');
+
 $app->get('/:string', function ($str) use ($app) {
 	$app->view('home', array(
 		'str' => $str
