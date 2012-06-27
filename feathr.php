@@ -8,8 +8,8 @@ class Feathr {
 	
 	public $root, $method;
 	public $view_path = '/views/';		
-	public $header	  = '/views/includes/header.php';
-	public $footer	  = '/views/includes/footer.php';
+	public $header	  = 'includes/header.php';
+	public $footer	  = 'includes/footer.php';
 	
 	public function __construct ($app_name, $view_path = null) {
 		$this->root		 = $_SERVER['DOCUMENT_ROOT'];
@@ -62,11 +62,11 @@ class Feathr {
 				extract($vars, EXTR_PREFIX_SAME, "wddx");			
 			}
 			if ($hf) {
-				include_once($this->root.$this->header);	
+				include_once($this->root.$this->view_path.$this->header);	
 			}
 			include_once($this->root.$this->view_path.$file.'.php');
 			if ($hf) {
-				include_once($this->root.$this->footer);	
+				include_once($this->root.$this->view_path.$this->footer);	
 			}
 		}
 		return $this;
