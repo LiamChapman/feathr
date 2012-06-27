@@ -77,7 +77,7 @@ class Feathr {
 	}	
 	
 	public function view ($file = null, $vars, $hf = true) {
-		$vars = $this->vars($vars);
+		$vars = $this->defaults($vars);
 		$file = is_null($file) ? 'default' : $file;
 		if (file_exists($this->root.$this->view_path.$file.'.php')) {
 			if (is_array($vars) && count($vars) > 0) {
@@ -94,7 +94,7 @@ class Feathr {
 		return $this;
 	}	
 	
-	public function vars ($vars = array ()) {
+	public function defaults ($vars = array ()) {
 		$defaults = array(
 			'page_title' => $this->app_name
 		);

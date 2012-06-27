@@ -8,26 +8,6 @@ $app->get('/', function () use ($app) {
 	$app->view('home');
 });
 
-# blog start
-$app->group('blog', array(
-		'/blog' => $app->get( function () use ($app) {
-			echo 'this is the blog';
-		}),
-		'/blog/article/:int' => $app->get( function ($id) use ($app) {
-			echo 'this is an article: ' . $id;
-		})
-	)
-);
-# blog end
-
-# test
-$app->application('test', 'app');
-
-$app->get('/:string, /:string/:int', function ($str, $int) use ($app) {
-	$app->view(null, array(
-		'slug' 		=> $str,
-		'value'		=> $int
-	));
-});
+# removed test routes.
 
 $app->run();
