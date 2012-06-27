@@ -57,6 +57,7 @@ class Feathr {
 			$this->E404();
 		}
 	}	
+	
 	public function group ($id, $array) {
 		if (isset($id)) {
 			$this->groups[$id] = $array;
@@ -122,15 +123,6 @@ class Feathr {
 				require_once($class);
 			}
 		});
-		$this->get(':any.css', function ($file) use ($instance) {
-			$instance->css($file);
-		});
-		$this->get(':any.js', function ($file) use ($instance) {
-			$instance->js($file);
-		});
-		$this->get(':any.png, :any.jpg, :any.gif', function ($file) use ($instance) {
-			$instance->image($file);
-		});
 	}
 	
 	public function route () {
@@ -154,32 +146,6 @@ class Feathr {
 		} else {
 			$this->E404();
 		} 
-	}
-							
-	public function css ($file) {
-		header('Content-Type: text/css');
-		echo(file_get_contents($this->root.$file.'.css'));
-		exit;
-	}
-		
-	public function js ($file) {
-		header('Content-Type: application/javascript');
-		echo(file_get_contents($this->root.$file.'.js'));
-		exit;
-	}
-		
-	public function image ($file) {		
-		if (file_exists($this->root.$file.'.png')) {
-			header('Content-Type: image/png');
-			readfile($this->root.$file.'.png');
-		} else if (file_exists($this->root.$file.'.jpg')) {
-			header('Content-Type: image/jpeg');
-			readfile($this->root.$file.'.jpg');
-		} else if (file_exists($this->root.$file.'.gif')){
-			header('Content-Type: image/gif');
-			readfile($this->root.$file.'.gif');
-		}
-		exit;
 	}
 					
 	public function run ($error_reporting = 0, $charset = 'utf-8') {		
