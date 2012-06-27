@@ -23,7 +23,7 @@ class Feathr {
 			if(strpos($route, ",")) {
 				$routes = explode(",", $route);
 				foreach($routes as $r) {
-					$this->actions[$r] = $callback;
+					$this->actions[trim($r)] = $callback;
 				}
 			} else {
 				$this->actions[$route] = $callback;
@@ -39,7 +39,7 @@ class Feathr {
 			if(strpos($route, ",")) {
 				$routes = explode(",", $route);
 				foreach($routes as $r) {
-					$this->actions[$r] = $callback;
+					$this->actions[trim($r)] = $callback;
 				}
 			} else {
 				$this->actions[$route] = $callback;
