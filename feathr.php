@@ -140,18 +140,20 @@ class Feathr {
 			':int'		=> '([0-9]+)',
 			':any'	  	=> '(.+)'
 		);
-		$counter = 0;
+		$request = array();
 		foreach ($this->actions as $route => $callback ) {
 			$find = '!^'.str_replace(array_keys($patterns), array_values($patterns), $route).'\/?$!';
-			if (preg_match($find, $uri, $params)) {
+			if (preg_match($find, $uri, $params) && !isset($request['callback'])) {
 				array_shift($params);
-				++$counter;
-				call_user_func_array($callback, $params);
+				$request['callback'] = $callback;
+				$request['params']	 = $params;				
 			}	
-		}
-		if ($counter === 0) {
+		}				
+		if (!empty($request)) {
+			call_user_func_array($request['callback'], $request['params']);
+		} else {
 			$this->E404();
-		}
+		} 
 	}
 							
 	public function css ($file) {
