@@ -18,35 +18,53 @@ class Feathr {
 		$this->view_path = !is_null($view_path) ? $view_path : $this->view_path;
 	}
 	
-	public function get ($route, $callback) {
+	public function get ($route = null, $callback = null) {
 		if($this->method === 'get') {
-			if(strpos($route, ",")) {
-				$routes = explode(",", $route);
-				foreach($routes as $r) {
-					$this->actions[trim($r)] = $callback;
+			if(is_string($route)) {
+				if(strpos($route, ",")) {
+					$routes = explode(",", $route);
+					foreach($routes as $r) {
+						$this->actions[trim($r)] = $callback;
+					}
+				} else {
+					$this->actions[$route] = $callback;
 				}
+				return $this;
 			} else {
-				$this->actions[$route] = $callback;
+				return $route;
 			}
-			return $this;
 		} else {
 			$this->E404();
 		}
 	}
 	
-	public function post ($route, $callback) {
+	public function post ($route = null, $callback = null) {
 		if($this->method === 'post') {
-			if(strpos($route, ",")) {
-				$routes = explode(",", $route);
-				foreach($routes as $r) {
-					$this->actions[trim($r)] = $callback;
+			if(is_string($route)) {
+				if(strpos($route, ",")) {
+					$routes = explode(",", $route);
+					foreach($routes as $r) {
+						$this->actions[trim($r)] = $callback;
+					}
+				} else {
+					$this->actions[$route] = $callback;
 				}
+				return $this;
 			} else {
-				$this->actions[$route] = $callback;
+				return $route; //no chaining this way
 			}
-			return $this;
 		} else {
 			$this->E404();
+		}
+	}
+	
+	public function group ($id, $array) {
+		if ( isset($id) ) {
+			if (is_array($array) && !empty($array)) {
+				foreach($array as $route => $app_callback) {
+					$this->actions[$route] = $app_callback;
+				}
+			}
 		}
 	}
 	
