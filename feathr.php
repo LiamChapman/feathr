@@ -2,6 +2,8 @@
 
 namespace Feathr;
 
+version_compare(PHP_VERSION, '5.3', '<') ? exit("PHP 5.3 or Higher") : '';
+
 class Feathr {	
 
 	public $app_name, $actions = array(), $data = array(), $groups = array(), $applications = array();	
@@ -89,15 +91,14 @@ class Feathr {
 		return $defaults;
 	}	
 	
-	public function autoload () { /*
-		spl_autoload_register( function ($class) {	
-			$class = strtolower($class);		
-			if ( file_exists($this->root.'/extend/'.$class.'.php') ) {
-				echo $class; exit;
-				require_once($this->root.'/extend/'.$class.'.php');
+	public function autoload () { 		
+		$instance = $this;
+		spl_autoload_register( function ($class) use ($instance) {				
+			$class = str_replace(array('\\','feathr'), array('/', ''), strtolower($class));
+			if ( file_exists($instance->root.$class.'.php') ) {			
+				require_once($instance->root.$class.'.php');
 			}
-		}); */
-		require_once($this->root.'/extend/less.php');
+		});	
 	}
 	
 	public function route () {
