@@ -4,10 +4,6 @@
 
 $app  = new Feathr\Feathr('Feathr');
 
-# - experimenting with components - not working yet.
-#$less = new Feathr\Extend\less();
-#$less->parse(__DIR__.'/media/styles/feathr');
-
 $app->get('/', function () use ($app) {
 	$app->view('home');
 });
@@ -20,6 +16,10 @@ $app->get('/:string', function ($str) use ($app) {
 	));
 });
 
-# removed test routes.
+# less - wip
+$app->get(':any.css', function ($file) use ($app) {
+	#$less = new Feathr\Extend\less();
+	#$less->parse($file);
+});
 
 $app->run();

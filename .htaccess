@@ -2,4 +2,5 @@ AddHandler php-stable .php
 AddDefaultCharset utf-8
 RewriteEngine on
 RewriteCond %{REQUEST_FILENAME} !-f
+#RewriteRule (.*)\.css$ index.php?url=$1.css [L,QSA]
 RewriteRule ^(.*) index.php?url=/$1 [QSA,L]
