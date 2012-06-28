@@ -10,38 +10,44 @@ body {
 	font-size: 1em;	
 }
 
-#wrapper h1#logo {
-	padding: 20px;
-	margin: 0 auto;
-	width: 250px;
-	height: 305px;
-}
+#wrapper  {
 
-#wrapper h1 {
-	font-size: 2em;
-	font-weight: bold;
-	text-align: center;
-	margin: 1em;
-	text-shadow: 1px 1px 2px #fff;
-}
-
-#wrapper h1.error {
-	font-style: oblique;
-	font-size: 3em;
-}
-
-#wrapper p {
-	text-align: center;
-	font-family: 0.0625em;
-	text-shadow: 1px 1px 2px #fff;
-}
-
-#wrapper p.error {
-	color: red;
-	font-weight: bold;
-}
-
-#wrapper h2 {
-	text-align: center;
-	margin: 10px 0;
+	h1 {
+		font-size: 2em;
+		font-weight: bold;
+		text-align: center;
+		margin: 1em;
+		text-shadow: 1px 1px 2px #fff;
+		
+		&#logo {
+			padding: 20px;
+			margin: 0 auto;
+			width: 250px;
+			height: 305px;			
+		}
+		
+		&.error {
+			font-style: oblique;
+			font-size: 3em;
+		}
+		
+	}
+	
+	h2 {
+		text-align: center;
+		margin: 10px 0;		
+	}
+	
+	p {
+		text-align: center;
+		font-family: 0.0625em;
+		text-shadow: 1px 1px 2px #fff;
+		
+		&.error {
+			color: red;
+			font-weight: bold;
+		}
+		
+	}
+	
 }

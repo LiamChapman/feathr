@@ -9,17 +9,18 @@ class Feathr {
 	public $app_name, $actions = array(), $data = array(), $groups = array(), $applications = array();	
 	public $root, $method;
 	public $view_path = '/views/';
-	public $app_path  = '/applications/';
+	public $app_path  = '/apps/';
+	public $json_path = '/json/';
 	public $header	  = 'includes/header.php';
 	public $footer	  = 'includes/footer.php';	
 	
-	public function __construct ($app_name = null, $view_path = null, $app_path = null) {
+	public function __construct ($app_name = null, $view_path = null, $app_path = null, $json_path = null) {
 		$this->root		 = $_SERVER['DOCUMENT_ROOT'];
 		$this->method	 = strtolower($_SERVER['REQUEST_METHOD']);
 		$this->app_name  = $app_name;
 		$this->view_path = !is_null($view_path) ? $view_path : $this->view_path;
 		$this->app_path  = !is_null($app_path) ? $app_path : $this->app_path;
-		$this->autoload();
+		$this->json_path = !is_null($json_path) ? $json_path : $this->json_path;
 	}	
 	
 	public function request ($route = null, $callback = null) {
@@ -30,20 +31,56 @@ class Feathr {
 					$this->actions[trim($r)] = $callback;
 				}
 			} else {
-				$this->actions[$route] = $callback;
+				$this->actions[trim($route)] = $callback;
 			}
 			return $this;
 		} else {
 			return $route;
 		}
-	}		
+	}
+	
+	public function json ($file = null, $data = array(), $base64 = true) {
+		if (!is_null($file)) {
+			$file = $this->root.$this->json_path.$file.'.json';						
+			if(empty($data)) {				
+				$json = file_get_contents($file);
+				#exit(base64_decode($json));
+				header('Content-Type: application/json');
+				if ($base64) {
+					return base64_decode(json_decode($json));	
+				} else {
+					return json_decode($json);
+				}
+				exit;
+			} else {
+				if (!file_exists($file)) {
+					$data = json_encode($data);					
+					if (file_put_contents($file, ($base64 ? base64_encode($data) : $data))) {
+						return true;
+					} else {
+						return false;
+					}
+				} else {
+					$current = $base64 ? base64_decode(file_get_contents($file)) : file_get_contents($file);
+					$json	 = json_decode($current);
+					$merge	 = array_merge($json, $data);
+					$data = json_encode($merge);					
+					if (file_put_contents($file, ($base64 ? base64_encode($data) : $data))) {
+						return true;
+					} else {
+						return false;
+					}
+				}
+			}				
+		}
+	}
 	
 	public function group ($id, $array) {
 		if (isset($id)) {
 			$this->groups[$id] = $array;
 			if (is_array($array) && !empty($array)) {
-				foreach ($array as $route => $app_callback) {
-					$this->actions[$route] = $app_callback;
+				foreach ($array as $route => $callback) {
+					$this->actions[$route] = $callback;
 				}
 			}
 			return $this;
@@ -59,6 +96,7 @@ class Feathr {
 	}	
 	
 	public function view ($file = null, $vars, $hf = true) {
+		header("Content-Type: text/html");
 		$vars = $this->defaults($vars);
 		$file = is_null($file) ? 'default' : $file;
 		if (file_exists($this->root.$this->view_path.$file.'.php')) {
@@ -122,7 +160,7 @@ class Feathr {
 		} else {
 			$this->E404();
 		} 
-	}
+	}		
 					
 	public function run ($error_reporting = 0, $charset = 'utf-8') {		
 		error_reporting($error_reporting);
@@ -130,6 +168,7 @@ class Feathr {
 		mb_internal_encoding($charset);
 		mb_detect_order($charset);
 		session_start();				
+		$this->autoload();
 		$this->route();
 		exit;
 	}

@@ -3,18 +3,6 @@
 
 $app  = new Feathr\Feathr('Feathr');
 
-$app->get('/', function () use ($app) {
-	$app->view('home');
-});
-
-$app->application('test');
-
-$app->get('/:string', function ($str) use ($app) {
-	$app->view('home', array(
-		'str' => $str
-	));
-});
-
 # less
 $app->get(':any.css', function ($file) {
 	$less = new Feathr\Extend\Less;
@@ -30,4 +18,13 @@ $app->get(':any.js', function ($file) {
 });
 */
 
+# home page
+$app->get('/', function () use ($app) {
+	$app->view('home');
+});
+
+# pages/default app
+$app->application('pages');
+
+# go, go, go!
 $app->run();

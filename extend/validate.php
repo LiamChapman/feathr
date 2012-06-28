@@ -1,7 +1,9 @@
 <?php
 
+namespace Feathr\Extend;
 use Feathr;
-class Validate extends Feathr {
+
+class Validate extends Feathr\Feathr {
 	
 	public function filter ($check, $key) {
 		$counter = 0;
@@ -18,20 +20,21 @@ class Validate extends Feathr {
 				if(is_array($key)) {
 					foreach ($key as $x => $k) {
 						if(!filter_var($check[$x], $filters[$k])) {
-							$this->feedback('Error validating', 'error');
+							#$this->feedback('Error validating', 'error');
 							++$counter;	
 						}
 					}
 				} else {
 					if(!filter_var($c, $filters[$key])) {
-						$this->feedback('Error validating', 'error');
+						#$this->feedback('Error validating', 'error');
 						++$counter;
 					}
 				}
 			}
+			return $this;
 		} else {
 			if(!filter_var($check, $filters[$key])) {
-				$this->feedback('Error validating', 'error');
+				#$this->feedback('Error validating', 'error');
 				++$counter;
 			}
 		}
