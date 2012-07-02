@@ -42,16 +42,25 @@ class Feathr {
 	public function json ($file = null, $data = array(), $base64 = true) {
 		if (!is_null($file)) {
 			$file = $this->root.$this->json_path.$file.'.json';						
-			if(empty($data)) {				
+			if(empty($data) && !is_bool($data)) {
 				$json = file_get_contents($file);
-				header('Content-Type: application/json');
-				if ($base64) {
-					$json = base64_decode($json);
-					return json_decode($json);
-				} else {
-					return json_decode($json);
+				if(!is_bool($data)) {
+					header('Content-Type: application/json');
+					if ($base64) {
+						$json = base64_decode($json);
+						return json_decode($json);
+						} else {
+							return json_decode($json);
+						}
+					exit;
+				} else if(is_bool($data) && $data == true) {
+					if ($base64) {
+						$json = base64_decode($json);
+						return (object) json_decode($json);
+					} else {
+						return (object) json_decode($json);
+					}
 				}
-				exit;
 			} else {
 				if (!file_exists($file)) {
 					$data = json_encode($data);					
