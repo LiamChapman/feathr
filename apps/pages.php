@@ -1,5 +1,14 @@
 <?php
 
+$app->get('/log/check', function () use ($app) {
+	echo 'huzzah!';
+}); //->user->auth();
+
+$app->get('/log/set', function () use ($app) {
+	$_SESSION['auth'] = true;
+	echo 'session set';
+});
+
 $app->get('/get/:string', function ($slug) use ($app) {	
 	if(isset($slug)) {
 		#$app->json_path = '/';

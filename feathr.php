@@ -21,6 +21,7 @@ class Feathr {
 		$this->view_path = !is_null($view_path) ? $view_path : $this->view_path;
 		$this->app_path  = !is_null($app_path) ? $app_path : $this->app_path;
 		$this->json_path = !is_null($json_path) ? $json_path : $this->json_path;
+		$this->autoload();
 	}	
 	
 	public function request ($route = null, $callback = null) {
@@ -148,6 +149,14 @@ class Feathr {
 		});	
 	}
 	
+	public function extend ($classes) {
+		foreach ($classes as $class) {
+			$namespace = 'Feathr\Extend\\'.$class;
+			$this->data[strtolower($class)] = new $namespace;
+		}
+		return $this;
+	}
+	
 	public function route () {
 		$uri 		= $_SERVER['REQUEST_URI'];
 		$patterns	= array(
@@ -176,11 +185,12 @@ class Feathr {
 		ini_set('default_charset', $charset);
 		mb_internal_encoding($charset);
 		mb_detect_order($charset);
-		session_start();				
-		$this->autoload();
+		session_start();
 		$this->route();
 		exit;
 	}
+	
+	
 			
 	public function E404 () {
 		header( $_ENV['SERVER_PROTOCOL']." 404 Not Found", true, 404 );
