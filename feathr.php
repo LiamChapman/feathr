@@ -189,6 +189,8 @@ class Feathr {
 			$this->request($args[0], $args[1]);
 		} else if ($call === 'post' && $this->method === 'post') {
 			$this->request($args[0], $args[1]);
+		} else if ($call === 'xhr' && $_SERVER['HTTP_X_REQUESTED_WITH'] && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
+			$this->request($args[0], $args[1]);
 		} else if(!method_exists($this, $call)) {
 			$this->E404(); //throw exception instead?
 		}
