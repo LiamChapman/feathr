@@ -4,16 +4,11 @@ $app->get('/get-json', function () use ($app) {
 	var_dump($app->json('test'));
 });
 
-$app->get('/save-json', function ($slug) use ($app) {
+$app->get('/save-json/:string', function ($slug) use ($app) {
 	if(isset($slug)) {
 		# save data test
 		$save = $app->json('test', array(
-			'test' => "123",
-			'more' => array(
-				'a' => 'b',
-				'c' => 'd',
-				'e' => 'f'
-			)
+			'yo' => 'hai'
 		));		
 		# create message
 		if ($save) {			

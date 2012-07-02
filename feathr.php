@@ -44,10 +44,10 @@ class Feathr {
 			$file = $this->root.$this->json_path.$file.'.json';						
 			if(empty($data)) {				
 				$json = file_get_contents($file);
-				#exit(base64_decode($json));
 				header('Content-Type: application/json');
 				if ($base64) {
-					return base64_decode(json_decode($json));	
+					$json = base64_decode($json);
+					return json_decode($json);
 				} else {
 					return json_decode($json);
 				}
@@ -61,10 +61,10 @@ class Feathr {
 						return false;
 					}
 				} else {
-					$current = $base64 ? base64_decode(file_get_contents($file)) : file_get_contents($file);
-					$json	 = json_decode($current);
-					$merge	 = array_merge($json, $data);
-					$data = json_encode($merge);					
+					$current = $base64 ? base64_decode(file_get_contents($file)) : file_get_contents($file);					
+					$json	 = json_decode($current);					
+					$merge	 = array_merge((array) $json, (array) $data);
+					$data	 = json_encode($merge);					
 					if (file_put_contents($file, ($base64 ? base64_encode($data) : $data))) {
 						return true;
 					} else {
