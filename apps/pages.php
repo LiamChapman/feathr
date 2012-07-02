@@ -1,26 +1,17 @@
 <?php
 
-$app->get('/get-json', function () use ($app) {
-	var_dump($app->json('test'));
+$app->get('/get/:string', function ($slug) use ($app) {	
+	if(isset($slug)) {
+		#$app->json_path = '/';
+		var_dump($app->json($slug));
+	}
 });
 
-$app->get('/save-json/:string', function ($slug) use ($app) {
+$app->get('/save/:string', function ($slug) use ($app) {
 	if(isset($slug)) {
-		# save data test
-		$save = $app->json('test', array(
-			'yo' => 'hai'
-		));		
-		# create message
-		if ($save) {			
-			$response = 'Saved';
-		} else {
-			$response = 'Error Saving';
-		}		
-		# show view
-		$app->view('default', array (
-			'msg' 	=> $response
-		));				
-	} else {
-		return $app->E404;
+		#$app->json_path = '/';
+		$app->json($slug, array(
+			'slug' => $slug
+		));
 	}
 });
