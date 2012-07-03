@@ -1,8 +1,13 @@
 <?php
 
+# extensions
+$app->extend(array(
+	'user'
+));
+
 $app->get('/log/check', function () use ($app) {
 	echo 'huzzah!';
-}); //->user->auth();
+}); #->user->auth();
 
 $app->get('/log/set', function () use ($app) {
 	$_SESSION['auth'] = true;

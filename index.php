@@ -3,14 +3,6 @@
 
 $app  = new Feathr\Feathr('Feathr');
 
-$app->extend(array(
-	'user'
-));
-
-#$m = get_class_methods($app); 
-#print_r($m);
-#exit;
-
 # less
 $app->get(':any.css', function ($file) {
 	$less = new Feathr\Extend\Less;
