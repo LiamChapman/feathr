@@ -6,7 +6,7 @@ version_compare(PHP_VERSION, '5.3', '<') ? exit("PHP 5.3 or Higher") : '';
 
 class Feathr {	
 
-	public $app_name, $actions = array(), $data = array(), $groups = array(), $applications = array();	
+	public $app_name, $actions = array(), $data = array(), $groups = array(), $applications = array(), $extended = array();
 	public $root, $method;
 	public $view_path = '/views/';
 	public $app_path  = '/apps/';
@@ -14,14 +14,23 @@ class Feathr {
 	public $header	  = 'includes/header.php';
 	public $footer	  = 'includes/footer.php';	
 	
-	public function __construct ($app_name = null, $view_path = null, $app_path = null, $json_path = null) {
+	static $instance;
+	private static function instance () {
+		if(!self::$instance)
+			self::$instance = $this; //new self();
+						
+		return self::$instance;
+	}
+	
+	public function __construct ($app_name = null, $ext = array (), $view_path = null, $app_path = null, $json_path = null) {
 		$this->root		 = $_SERVER['DOCUMENT_ROOT'];
 		$this->method	 = strtolower($_SERVER['REQUEST_METHOD']);
-		$this->app_name  = $app_name;
+		$this->app_name  = $app_name;		
 		$this->view_path = !is_null($view_path) ? $view_path : $this->view_path;
 		$this->app_path  = !is_null($app_path) ? $app_path : $this->app_path;
-		$this->json_path = !is_null($json_path) ? $json_path : $this->json_path;
+		$this->json_path = !is_null($json_path) ? $json_path : $this->json_path;		
 		$this->autoload();
+		$this->extend($ext);
 	}	
 	
 	public function request ($route = null, $callback = null) {
@@ -50,9 +59,9 @@ class Feathr {
 					if ($base64) {
 						$json = base64_decode($json);
 						return json_decode($json);
-						} else {
-							return json_decode($json);
-						}
+					} else {
+						return json_decode($json);
+					}
 					exit;
 				} else if(is_bool($data) && $data == true) {
 					if ($base64) {
@@ -151,8 +160,8 @@ class Feathr {
 	
 	public function extend ($classes) {
 		foreach ($classes as $class) {
-			$namespace = 'Feathr\Extend\\'.$class;
-			$this->data[strtolower($class)] = new $namespace;
+			$namespace = 'Feathr\Extend\\'.ucfirst($class);
+			$this->extended[strtolower($class)] = new $namespace;
 		}
 		return $this;
 	}
@@ -172,7 +181,7 @@ class Feathr {
 				$request['callback'] = $callback;
 				$request['params']	 = $params;				
 			}	
-		}				
+		}
 		if (!empty($request)) {
 			call_user_func_array($request['callback'], $request['params']);
 		} else {
@@ -190,8 +199,6 @@ class Feathr {
 		exit;
 	}
 	
-	
-			
 	public function E404 () {
 		header( $_ENV['SERVER_PROTOCOL']." 404 Not Found", true, 404 );
 		if ( file_exists($this->root.$this->view_path.'404.php') ) {
@@ -210,9 +217,12 @@ class Feathr {
 			$this->request($args[0], $args[1]);
 		} else if ($call === 'xhr' && $_SERVER['HTTP_X_REQUESTED_WITH'] && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
 			$this->request($args[0], $args[1]);
-		} else if(!method_exists($this, $call)) {
-			$this->E404(); //throw exception instead?
+		} else {
+			if (!method_exists($this, $call)) {
+				$this->E404(); //throw exception instead?
+			}
 		}
+		return $this;
 	}
 	
 	public function __set ($name, $value) {
@@ -226,9 +236,11 @@ class Feathr {
 			return $this->$name();
 		} else if (isset($this->data[$name])) {
 			return $this->data[$name];
+		} else if (isset($this->extended[$name])) {
+			return $this->extended[$name];
 		} else {
 			$this->E404(); //throw exception instead?
 		}
 	}
-		
+	
 }

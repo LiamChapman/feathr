@@ -1,7 +1,9 @@
 <?php require_once __DIR__ . '/feathr.php'; ?>
 <?php
 
-$app  = new Feathr\Feathr('Feathr');
+$app  = new Feathr\Feathr('Feathr', array(
+	'user'
+));
 
 # less
 $app->get(':any.css', function ($file) {
