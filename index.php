@@ -1,4 +1,4 @@
-<?php require_once __DIR__ . '/feathr.php'; ?>
+<?php version_compare(PHP_VERSION, '5.4') >= 0 ? require_once __DIR__ . '/5.4/feathr.php' : require_once __DIR__ . '/feathr.php'; ?>
 <?php
 
 $app  = new Feathr\Feathr('Feathr', array(
