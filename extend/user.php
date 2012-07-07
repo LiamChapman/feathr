@@ -3,7 +3,7 @@
 namespace Feathr\Extend;
 use Feathr;
 
-class User extends Feathr\Feathr {		
+class User extends Feathr\FeathrApp {		
 	public function auth () {
 		if(isset($_SESSION['auth'])) {
 			return true;

@@ -3,7 +3,7 @@
 namespace Feathr\Extend;
 use Feathr;
 
-class Less extends Feathr\Feathr {
+class Less extends Feathr\FeathrApp {
 	# put this in .htaccess -> 
 	# RewriteRule (.*)\.css$ index.php?url=$1.css [L,QSA]
 	# put it after Rewrite Engine on

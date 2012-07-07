@@ -3,7 +3,7 @@
 namespace Feathr\Extend;
 use Feathr;
 
-class Sprockets extends Feathr\Feathr {
+class Sprockets extends Feathr\FeathrApp {
 	# put this in .htaccess -> 
 	# RewriteRule (.*)\.js$ index.php?url=$1.js [L,QSA]
 	# put it after Rewrite Engine on

@@ -4,7 +4,7 @@ namespace Feathr;
 
 version_compare(PHP_VERSION, '5.3', '<') ? exit("PHP 5.3 or Higher") : '';
 
-class Feathr {	
+class FeathrApp {	
 
 	public $app_name, $actions = array(), $data = array(), $groups = array(), $applications = array(), $extended = array();
 	public $root, $method;

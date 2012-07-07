@@ -3,7 +3,7 @@
 namespace Feathr\Extend;
 use Feathr;
 
-class Validate extends Feathr\Feathr {
+class Validate extends Feathr\FeathrApp {
 	
 	public function filter ($check, $key) {
 		$counter = 0;
