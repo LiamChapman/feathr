@@ -6,7 +6,8 @@ use Feathr;
 class User extends Feathr\FeathrApp {		
 	public function auth () {
 		if(!isset($_SESSION['auth'])) {
-			//die("You do not have permission to this area");
+//			parent::$bool = false;
+//			throw new Exception("No session set");
 		}
 		return $this;
 	}

@@ -19,7 +19,7 @@ class FeathrApp {
 		   $header	  	 = 'includes/header.php',
 		   $footer	  	 = 'includes/footer.php';	
 	
-	static $instance;
+	static $instance, $bool = true;
 	private static function instance () {
 		if(!self::$instance)
 			self::$instance = $this;
@@ -213,19 +213,21 @@ class FeathrApp {
 	}
 	
 	public function __call ($call, $args) {
-		$call = strtolower($call);
-		if ($call === 'get' && $this->method === 'get') {
-			$this->request($args[0], $args[1]);
-		} else if ($call === 'post' && $this->method === 'post') {
-			$this->request($args[0], $args[1]);
-		} else if ($call === 'xhr' && $_SERVER['HTTP_X_REQUESTED_WITH'] && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
-			$this->request($args[0], $args[1]);
-		} else {
-			if (!method_exists($this, $call)) {
-				$this->E404(); //throw exception instead?
+		if (self::$bool) {
+			$call = strtolower($call);
+			if ($call === 'get' && $this->method === 'get') {
+				$this->request($args[0], $args[1]);
+			} else if ($call === 'post' && $this->method === 'post') {
+				$this->request($args[0], $args[1]);
+			} else if ($call === 'xhr' && $_SERVER['HTTP_X_REQUESTED_WITH'] && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
+				$this->request($args[0], $args[1]);
+			} else {
+				if (!method_exists($this, $call)) {
+					$this->E404(); //throw exception instead?
+				}
 			}
-		}
-		return $this;
+			return $this;
+		}		
 	}
 	
 	public function __set ($name, $value) {
