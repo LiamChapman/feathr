@@ -1,8 +1,8 @@
 <?php
 
 $app->get('/log/check', function () use ($app) {
-	echo 'huzzah!';
-})->user->auth();
+	echo 'huzzah!';	
+})->user->auth($app);
 
 $app->get('/log/set', function () use ($app) {
 	echo 'session set';

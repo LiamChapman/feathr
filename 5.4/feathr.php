@@ -6,18 +6,23 @@ version_compare(PHP_VERSION, '5.4', '<') ? exit("PHP 5.4 or Higher") : '';
 
 class FeathrApp {	
 
-	public $app_name, $actions = [], $data = [], $groups = [], $applications = [], $extended = [];
-	public $root, $method;
-	public $view_path = '/views/';
-	public $app_path  = '/apps/';
-	public $json_path = '/json/';
-	public $header	  = 'includes/header.php';
-	public $footer	  = 'includes/footer.php';	
+	public $app_name, $root, $method, $uri,
+		   $call		 = [],
+		   $actions 	 = [], 
+		   $data 		 = [], 
+		   $groups 		 = [], 
+		   $applications = [], 
+		   $extended 	 = [],
+		   $view_path 	 = '/views/',
+		   $app_path  	 = '/apps/',
+		   $json_path 	 = '/json/',
+		   $header	  	 = 'includes/header.php',
+		   $footer	  	 = 'includes/footer.php';	
 	
 	static $instance;
 	private static function instance () {
 		if(!self::$instance)
-			self::$instance = $this; //new self();
+			self::$instance = $this;
 						
 		return self::$instance;
 	}
@@ -166,23 +171,22 @@ class FeathrApp {
 	}
 	
 	public function route () {
-		$uri 		= $_SERVER['REQUEST_URI'];
+		$this->uri 	= $_SERVER['REQUEST_URI'];
 		$patterns	= [
 			':string' 	=> '([^\/]+)',
 			':int'		=> '([0-9]+)',
 			':any'	  	=> '(.+)'
 		];
-		$request = [];
 		foreach ($this->actions as $route => $callback ) {
 			$find = '!^'.str_replace(array_keys($patterns), array_values($patterns), $route).'\/?$!';
-			if (preg_match($find, $uri, $params) && !isset($request['callback'])) {
+			if (preg_match($find, $this->uri, $params) && !isset($this->call['callback'])) {
 				array_shift($params);
-				$request['callback'] = $callback;
-				$request['params']	 = $params;				
+				$this->call['callback']  = $callback;
+				$this->call['params']	 = $params;				
 			}	
 		}
-		if (!empty($request)) {
-			call_user_func_array($request['callback'], $request['params']);
+		if (!empty($this->call)) {			
+			call_user_func_array($this->call['callback'], $this->call['params']);
 		} else {
 			$this->E404();
 		} 

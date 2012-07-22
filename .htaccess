@@ -1,4 +1,3 @@
-AddHandler php-stable .php
 AddDefaultCharset utf-8
 RewriteEngine on
 #RewriteRule (.*)\.js$ index.php?url=$1.js [L,QSA]
