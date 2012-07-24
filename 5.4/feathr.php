@@ -8,6 +8,7 @@ class FeathrApp {
 
 	public $app_name, $root, $method, $uri,
 		   $call		 = [],
+		   $error_msg	 = 'Error',
 		   $actions 	 = [], 
 		   $data 		 = [], 
 		   $groups 		 = [], 
@@ -28,6 +29,8 @@ class FeathrApp {
 	}
 	
 	public function __construct ($app_name = null, $ext = [], $view_path = null, $app_path = null, $json_path = null) {
+		set_exception_handler(array($this, 'exception'));
+		set_error_handler(array($this, 'error'));
 		$this->root		 = $_SERVER['DOCUMENT_ROOT'];
 		$this->method	 = strtolower($_SERVER['REQUEST_METHOD']);
 		$this->app_name  = $app_name;		
@@ -211,23 +214,38 @@ class FeathrApp {
 			exit('404 Error');
 		}
 	}
+
+	public function exception ($exception) {
+ 		#echo("Uncaught " . get_class($exception) . " exception: " . $exception->getMessage() . "\n");
+ 		#exit;
+	}
+
+	public function error ($error) {
+		#echo($error);
+		#exit;
+	}
 	
 	public function __call ($call, $args) {
-		if (self::$bool) {
-			$call = strtolower($call);
-			if ($call === 'get' && $this->method === 'get') {
-				$this->request($args[0], $args[1]);
-			} else if ($call === 'post' && $this->method === 'post') {
-				$this->request($args[0], $args[1]);
-			} else if ($call === 'xhr' && $_SERVER['HTTP_X_REQUESTED_WITH'] && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
-				$this->request($args[0], $args[1]);
-			} else {
-				if (!method_exists($this, $call)) {
-					$this->E404(); //throw exception instead?
-				}
-			}
-			return $this;
-		}		
+		try {
+			if (self::$bool) {
+				$call = strtolower($call);
+				if ($call === 'get' && $this->method === 'get') {
+					$this->request($args[0], $args[1]);
+				} else if ($call === 'post' && $this->method === 'post') {
+					$this->request($args[0], $args[1]);
+				} else if ($call === 'xhr' && $_SERVER['HTTP_X_REQUESTED_WITH'] && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
+					$this->request($args[0], $args[1]);
+				} else {
+					if (!method_exists($this, $call)) {
+						$this->E404(); 
+					}
+				}			
+			} 
+		} catch (Exception $e) {
+			echo($e->getMessage());
+			exit;
+		}
+		return $this;	
 	}
 	
 	public function __set ($name, $value) {
@@ -244,7 +262,7 @@ class FeathrApp {
 		} else if (isset($this->extended[$name])) {
 			return $this->extended[$name];
 		} else {
-			$this->E404(); //throw exception instead?
+			$this->E404();
 		}
 	}
 	
