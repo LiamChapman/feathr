@@ -1,9 +1,22 @@
 <?php 
 
+# default namespace
 namespace Feathr;
 
+# this class runs on 5.3 or greater
 version_compare(PHP_VERSION, '5.3', '<') ? exit("PHP 5.3 or Higher") : '';
 
+/**
+ * @author Liam Chapman
+ * @version 1.0
+ * @example:
+ * $app = new Feathr\FeathrApp('My App');
+ * $app->get('/', function () use ($app) {
+ * 		$app->view('home');
+ * });
+ * $app->run();
+ * 
+ */
 class FeathrApp {	
 
 	public $app_name, $root, $method, $uri,
@@ -27,6 +40,11 @@ class FeathrApp {
 		return self::$instance;
 	}
 	
+	/**
+	 *  __construct
+	 *  sets up root, uri, paths, directory, app_name, methods
+	 *  @return void
+	 */
 	public function __construct ($app_name = null, $ext = array (), $dir = null, $view_path = null, $app_path = null, $json_path = null) {
 		$this->root		 = !is_null($dir) ? $_SERVER['DOCUMENT_ROOT'] . $dir : $_SERVER['DOCUMENT_ROOT'];
 		$this->uri 		 = !is_null($dir) ? str_replace($dir, '', $_SERVER['REQUEST_URI']) : $_SERVER['REQUEST_URI'];
@@ -40,6 +58,13 @@ class FeathrApp {
 		$this->extend($ext);
 	}	
 	
+	/**
+	 *  request
+	 *  Pass through path and action, gets used for all requests GET, POST and XHR (Could also be used for PUT & DELETE)
+	 *  @example:
+	 *  $app->request('/my-url', function () use ($app) {} )
+	 *  @return $this || @string
+	 */
 	public function request ($route = null, $callback = null) {
 		if (is_string($route)) {
 			if (strpos($route, ",")) {
@@ -56,6 +81,17 @@ class FeathrApp {
 		}
 	}
 	
+	/**
+	 *  json
+	 *  Save or Get a Json file
+	 *  @example:
+	 *  # get - if second par bool is true, won't return header and it will be an object.
+	 *	$app->json('myjson', [bool = false], [bool = true]);
+	 *  @return JSON
+	 *  # save
+	 *  $app->json('myjson', array(1=> 'test'), [bool = true]);
+	 *  @return Boolean
+	 */
 	public function json ($file = null, $data = array(), $base64 = true) {
 		if (!is_null($file)) {
 			$file = $this->root.$this->json_path.$file.'.json';						
@@ -100,7 +136,15 @@ class FeathrApp {
 			}				
 		}
 	}
-	
+	/**
+	 *  group
+	 *	@example:
+	 *  $app->group('mygroup_id', array(
+	 *		'/my-route' => function () use ($app) {},
+	 *		'/my-url'	=> function () use ($app) {}
+	 *	));
+	 *  @return $this 
+	 */
 	public function group ($id, $array) {
 		if (isset($id)) {
 			$this->groups[$id] = $array;
@@ -112,7 +156,12 @@ class FeathrApp {
 			return $this;
 		}
 	}	
-	
+	/**
+	 *	application
+	 *	@example:
+	 *  $app->application('myapp');
+	 *	@return $this
+	 */
 	public function application ($name = null, $var = 'app') {
 		if (!is_null($name)) {
 			$$var = $this;
@@ -121,6 +170,15 @@ class FeathrApp {
 		}
 	}	
 	
+	/**
+	 *	view
+	 *	@example:
+	 *	$app->view('homepage', [Array, Variable], [Bool = true]);
+	 *  $app->view('homepage', array('test' => 123)); 
+	 *	- Then in the view you can use $test, which will return 123
+	 *	- $hf = header and footer
+	 * 	@return $this
+	 */
 	public function view ($file = null, $vars, $hf = true) {
 		header("Content-Type: text/html");
 		$vars = $this->defaults($vars);
@@ -140,6 +198,12 @@ class FeathrApp {
 		return $this;
 	}	
 	
+	/**
+	 *	defaults
+	 *  default variables to be used, additional ones can be set and passed
+	 * 	$app->defaults(array('test' => 123))
+	 *	@return Array
+	 */
 	public function defaults ($vars = array ()) {
 		$defaults = array(
 			'page_title' => $this->app_name,
@@ -156,6 +220,11 @@ class FeathrApp {
 		return $defaults;
 	}	
 	
+	/**
+	 * autoload
+	 * autoload classes and they can also be loaded via namespace as long as directory matches
+	 * @return void
+	 */
 	public function autoload () { 		
 		$instance = $this;
 		spl_autoload_register( function ($class) use ($instance) {				
@@ -166,6 +235,13 @@ class FeathrApp {
 		});	
 	}
 	
+	/**
+	 * extend
+	 * when class names included in extend directory, they can be extended in the app instance
+	 * @example $app->extend(array('facebook', 'user'));
+	 * - $app->user->test()
+	 * @return $this
+	 */
 	public function extend ($classes) {
 		foreach ($classes as $class) {
 			$namespace = 'Feathr\Extend\\'.ucfirst($class);
@@ -174,6 +250,15 @@ class FeathrApp {
 		return $this;
 	}
 	
+	/**
+	 * route
+	 * - where the magic happens, routes urls to callback, 
+	 * - optionally remove query string as it can cause conflicts with third partys e.g. facebook
+	 * - urls can by sanitised / checked
+	 * @example:
+	 * /:string/:int/:any/my-url
+	 * @return void
+	 */
 	public function route ($ignore_qs=false) {		
 		$patterns	= array(
 			':string' 	=> '([^\/]+)',
@@ -196,7 +281,15 @@ class FeathrApp {
 			$this->E404();
 		} 
 	}		
-					
+	
+	/**
+	 * run
+	 * initialises app at the end of all the calls/requests
+	 * sets character encoding, error_reporting, enabling and disabling query string
+	 * enables sessions too.
+	 * @example: $app->run();
+	 * @return void
+	 */			
 	public function run ($error_reporting = 0, $ignore_qs = false, $charset = 'utf-8') {		
 		error_reporting($error_reporting);
 		ini_set('default_charset', $charset);
@@ -206,7 +299,12 @@ class FeathrApp {
 		$this->route($ignore_qs);
 		exit;
 	}
-	
+		
+	/**
+	 * E404
+	 * default 404 page to show when route not found and currently general errors.
+	 * @return void
+	 */
 	public function E404 () {	
 		header( $_ENV['SERVER_PROTOCOL']." 404 Not Found", true, 404 );
 		if ( file_exists($this->root.$this->view_path.'404.php') ) {
@@ -217,6 +315,14 @@ class FeathrApp {
 		}
 	}
 	
+	/**
+	 * __call
+	 * magic method to be used for POST, GET and XHR to detect request method
+	 * all runs through request method.
+	 * for third-parties such as facebook, there are some issues with this. 
+	 * @example $app->get('/my-route', function()); $app->post('/my-route', function)
+	 * @return $this
+	 */
 	public function __call ($call, $args) {
 		if (self::$bool) {
 			$call = strtolower($call);
@@ -235,10 +341,21 @@ class FeathrApp {
 		}		
 	}
 
+	/**
+	 * __set
+	 * magic method - sets vars to $data va so that custom vars can be used and passed around app
+	 * @example $app->test = 'test';
+	 * @return void;
+	 */
 	public function __set ($name, $value) {
 		$this->data[$name] = $value;
 	}	
 	
+	/**
+	 *	__get
+	 * magic method to get method, variable or extended function, if nothing found returns 404
+	 * @return void;
+	 */
 	public function __get ($name) {
 		if (isset($this->$name)) {
 			return $this->$name;
