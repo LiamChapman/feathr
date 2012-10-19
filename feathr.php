@@ -27,8 +27,10 @@ class FeathrApp {
 		return self::$instance;
 	}
 	
-	public function __construct ($app_name = null, $ext = array (), $view_path = null, $app_path = null, $json_path = null) {
-		$this->root		 = $_SERVER['DOCUMENT_ROOT'];
+	public function __construct ($app_name = null, $ext = array (), $dir = null, $view_path = null, $app_path = null, $json_path = null) {
+		$this->root		 = !is_null($dir) ? $_SERVER['DOCUMENT_ROOT'] . $dir : $_SERVER['DOCUMENT_ROOT'];
+		$this->uri 		 = !is_null($dir) ? str_replace($dir, '', $_SERVER['REQUEST_URI']) : $_SERVER['REQUEST_URI'];
+		$this->dir 		 = $dir;
 		$this->method	 = strtolower($_SERVER['REQUEST_METHOD']);
 		$this->app_name  = $app_name;		
 		$this->view_path = !is_null($view_path) ? $view_path : $this->view_path;
@@ -122,14 +124,14 @@ class FeathrApp {
 	public function view ($file = null, $vars, $hf = true) {
 		header("Content-Type: text/html");
 		$vars = $this->defaults($vars);
-		$file = is_null($file) ? 'default' : $file;
+		$file = is_null($file) ? 'default' : $file;		
 		if (file_exists($this->root.$this->view_path.$file.'.php')) {
 			if (is_array($vars) && count($vars) > 0) {
 				extract($vars, EXTR_PREFIX_SAME, "wddx");			
 			}
 			if ($hf) {
 				include_once($this->root.$this->view_path.$this->header);	
-			}
+			}		
 			include_once($this->root.$this->view_path.$file.'.php');
 			if ($hf) {
 				include_once($this->root.$this->view_path.$this->footer);	
@@ -140,7 +142,8 @@ class FeathrApp {
 	
 	public function defaults ($vars = array ()) {
 		$defaults = array(
-			'page_title' => $this->app_name
+			'page_title' => $this->app_name,
+			'_DIR' 		 => $this->dir
 		);
 		if (!empty($vars)) {
 			foreach ($vars as $key => $value) {
@@ -171,15 +174,15 @@ class FeathrApp {
 		return $this;
 	}
 	
-	public function route () {
-		$this->uri 	= $_SERVER['REQUEST_URI'];
+	public function route ($ignore_qs=false) {		
 		$patterns	= array(
 			':string' 	=> '([^\/]+)',
 			':int'		=> '([0-9]+)',
 			':any'	  	=> '(.+)'
-		);
-		$request = array();
+		);		
+		$request = array();		
 		foreach ($this->actions as $route => $callback ) {
+			$this->uri = $ignore_qs ? str_replace('?'. $_SERVER['QUERY_STRING'], '', $this->uri) : $this->uri; # ignore query string
 			$find = '!^'.str_replace(array_keys($patterns), array_values($patterns), $route).'\/?$!';
 			if (preg_match($find, $this->uri, $params) && !isset($this->call['callback'])) {
 				array_shift($params);
@@ -194,17 +197,17 @@ class FeathrApp {
 		} 
 	}		
 					
-	public function run ($error_reporting = 0, $charset = 'utf-8') {		
+	public function run ($error_reporting = 0, $ignore_qs = false, $charset = 'utf-8') {		
 		error_reporting($error_reporting);
 		ini_set('default_charset', $charset);
 		mb_internal_encoding($charset);
 		mb_detect_order($charset);
 		session_start();
-		$this->route();
+		$this->route($ignore_qs);
 		exit;
 	}
 	
-	public function E404 () {
+	public function E404 () {	
 		header( $_ENV['SERVER_PROTOCOL']." 404 Not Found", true, 404 );
 		if ( file_exists($this->root.$this->view_path.'404.php') ) {
 			$this->view('404', array('page_title' => '404 Error'));
@@ -224,14 +227,14 @@ class FeathrApp {
 			} else if ($call === 'xhr' && $_SERVER['HTTP_X_REQUESTED_WITH'] && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
 				$this->request($args[0], $args[1]);
 			} else {
-				if (!method_exists($this, $call)) {
+				if (!method_exists($this, $call)) {							
 					$this->E404(); //throw exception instead?
 				}
 			}
 			return $this;
 		}		
 	}
-	
+
 	public function __set ($name, $value) {
 		$this->data[$name] = $value;
 	}	
