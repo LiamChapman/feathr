@@ -30,15 +30,7 @@ class FeathrApp {
 		   $app_path  	 = '/apps/',
 		   $json_path 	 = '/json/',
 		   $header	  	 = 'includes/header.php',
-		   $footer	  	 = 'includes/footer.php';	
-	
-	static $instance, $bool = true;
-	private static function instance () {
-		if(!self::$instance)
-			self::$instance = $this; //new self();
-						
-		return self::$instance;
-	}
+		   $footer	  	 = 'includes/footer.php';		
 	
 	/**
 	 *  __construct
@@ -136,6 +128,7 @@ class FeathrApp {
 			}				
 		}
 	}
+
 	/**
 	 *  group
 	 *	@example:
@@ -155,7 +148,8 @@ class FeathrApp {
 			}
 			return $this;
 		}
-	}	
+	}
+		
 	/**
 	 *	application
 	 *	@example:
@@ -265,8 +259,7 @@ class FeathrApp {
 			':int'		=> '([0-9]+)',
 			':any'	  	=> '(.+)'
 		);		
-		$request = array();		
-		foreach ($this->actions as $route => $callback ) {
+		foreach ($this->actions as $route => $callback) {
 			$this->uri = $ignore_qs ? str_replace('?'. $_SERVER['QUERY_STRING'], '', $this->uri) : $this->uri; # ignore query string
 			$find = '!^'.str_replace(array_keys($patterns), array_values($patterns), $route).'\/?$!';
 			if (preg_match($find, $this->uri, $params) && !isset($this->call['callback'])) {
@@ -324,21 +317,19 @@ class FeathrApp {
 	 * @return $this
 	 */
 	public function __call ($call, $args) {
-		if (self::$bool) {
-			$call = strtolower($call);
-			if ($call === 'get' && $this->method === 'get') {
-				$this->request($args[0], $args[1]);
-			} else if ($call === 'post' && $this->method === 'post') {
-				$this->request($args[0], $args[1]);
-			} else if ($call === 'xhr' && $_SERVER['HTTP_X_REQUESTED_WITH'] && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
-				$this->request($args[0], $args[1]);
-			} else {
-				if (!method_exists($this, $call)) {							
-					$this->E404(); //throw exception instead?
-				}
+		$call = strtolower($call);
+		if ($call === 'get' && $this->method === 'get') {
+			$this->request($args[0], $args[1]);
+		} else if ($call === 'post' && $this->method === 'post') {
+			$this->request($args[0], $args[1]);
+		} else if ($call === 'xhr' && $_SERVER['HTTP_X_REQUESTED_WITH'] && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
+			$this->request($args[0], $args[1]);
+		} else {
+			if (!method_exists($this, $call)) {							
+				$this->E404(); //throw exception instead?
 			}
-			return $this;
-		}		
+		}
+		return $this;
 	}
 
 	/**
